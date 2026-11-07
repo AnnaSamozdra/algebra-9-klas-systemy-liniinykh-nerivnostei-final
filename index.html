@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Інтерактивний тренажер — системи нерівностей</title>
+<style>
+:root{--bg:#070b20;--panel:#111a3a;--panel2:#17234b;--ink:#edf4ff;--muted:#a9b9dc;--cyan:#42f5e8;--violet:#a879ff;--pink:#ff69c8;--gold:#ffd86b;--green:#55efb0;--red:#ff7188}
+*{box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Arial,Helvetica,sans-serif;background:radial-gradient(ellipse at 15% 5%,#18265a 0,transparent 36%),radial-gradient(ellipse at 88% 22%,#28164e 0,transparent 34%),linear-gradient(150deg,#070b20,#0b1029 55%,#090d20);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.45;background-image:radial-gradient(2px 2px at 8% 18%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 23% 75%,#fff 50%,transparent 60%),radial-gradient(2px 2px at 47% 32%,#b9faff 50%,transparent 60%),radial-gradient(1px 1px at 72% 12%,#fff 50%,transparent 60%),radial-gradient(2px 2px at 91% 68%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 61% 87%,#fff 50%,transparent 60%);background-size:370px 310px;animation:twinkle 5s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.22}to{opacity:.72}}
+header{position:relative;overflow:hidden;text-align:center;color:#fff;padding:25px 18px 24px;background:linear-gradient(100deg,#111d4d99,#29145c88);border-bottom:1px solid #4c58a9;box-shadow:0 8px 35px #050817}
+header:before{content:"✦     ·       ✧       ·       ✦";position:absolute;left:5%;top:12px;color:#9defff88;font-size:1.5rem;letter-spacing:1.1rem}
+header:after{content:"✧       ·       ✦";position:absolute;right:4%;bottom:13px;color:#d6a7ff88;font-size:1.3rem;letter-spacing:.8rem}
+header .tag{display:inline-block;background:#2c3a79aa;border:1px solid #6376c9;border-radius:30px;padding:8px 16px;font-size:.92rem;font-weight:900;letter-spacing:.1em;color:var(--cyan)}
+h1{font-size:clamp(1.8rem,4vw,3rem);margin:11px 0 6px;text-shadow:0 0 20px #6c65ff99}
+header p{font-size:clamp(1rem,1.7vw,1.2rem);margin:0 auto;max-width:900px;color:#c5d4ff}
+.wrap{max-width:1600px;margin:0 auto;padding:22px clamp(12px,2vw,28px) 38px;display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;align-items:start}
+.sidebar{position:sticky;top:14px;background:linear-gradient(160deg,#121c40ed,#101632ed);border:1px solid #4855a2;border-radius:23px;padding:18px;box-shadow:0 14px 40px #0005}
+.side-title{font-size:.9rem;font-weight:900;letter-spacing:.12em;color:#9eafff;margin:0 0 12px}
+.meter,.score{background:#17234b;border:1px solid #4859a6;border-radius:16px;padding:13px 14px;box-shadow:inset 0 0 18px #334a9a22}
+.meter-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:800;font-size:.95rem;color:#eaf1ff}
+.bar{height:10px;background:#080e29;border-radius:30px;overflow:hidden;margin-top:10px;border:1px solid #33417e}.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),#5d8cff,var(--violet));border-radius:30px;box-shadow:0 0 12px var(--cyan);transition:width .45s}
+.score{display:flex;align-items:center;gap:11px;margin-top:11px;font-weight:800;color:#cbd8ff}.score .coin{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#463b75;border:1px solid #aa91ff;font-size:1.4rem;box-shadow:0 0 16px #a879ff55}.score b{font-size:1.55rem;color:var(--gold)}
+.map-title{margin:20px 0 10px;color:#9eafff;font-size:.9rem;font-weight:900;letter-spacing:.12em}
+nav{display:flex;flex-direction:column;gap:8px;margin:0}
+nav button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #364477;background:#141e42;color:#d9e5ff;border-radius:13px;padding:11px 12px;font-size:1rem;font-weight:800;cursor:pointer;transition:.2s}
+nav button:before{content:"";width:10px;height:10px;flex:none;border-radius:50%;background:#6979a9;box-shadow:0 0 8px #6979a9}
+nav button:hover{border-color:var(--cyan);transform:translateX(3px)}nav button.active{background:linear-gradient(100deg,#273b83,#39276e);border-color:var(--cyan);color:#fff;box-shadow:0 0 18px #35d9df2c}nav button.active:before{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}nav button.done{border-color:#3e9e89;color:var(--green)}nav button.done:before{background:var(--green);box-shadow:0 0 10px var(--green)}
+.game-area{min-width:0}.card{background:linear-gradient(145deg,#121d40f5,#101832f5);border:1px solid #46549a;border-radius:24px;padding:clamp(20px,2.8vw,40px);box-shadow:0 18px 50px #0005;animation:cardIn .35s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.kicker{display:inline-flex;align-items:center;gap:8px;background:#30245d;border:1px solid #8669c9;color:#e4caff;border-radius:30px;padding:8px 15px;font-weight:900;font-size:.98rem}
+h2{font-size:clamp(1.7rem,2.8vw,2.4rem);color:#f2f5ff;margin:16px 0 8px}
+.muted{font-size:clamp(1.05rem,1.7vw,1.3rem);color:var(--muted);line-height:1.5;margin:0 0 19px}
+.problem{background:linear-gradient(115deg,#172b55,#211b4c);border:1px solid #4b73bd;border-left:6px solid var(--cyan);border-radius:18px;padding:24px 16px;margin:20px 0 24px;text-align:center;font:700 clamp(1.65rem,3vw,2.25rem) Georgia,serif;color:#f3f5ff;line-height:1.65;box-shadow:inset 0 0 25px #39d9df10,0 0 20px #35c9d91a}
+.system{display:inline-flex;align-items:center;gap:12px;text-align:left}.system .brace{font-size:4.6rem;line-height:.9;font-weight:400}.system .rows{display:flex;flex-direction:column;gap:2px}.system .rows span{white-space:nowrap}
+.radical{display:inline-flex;align-items:flex-start;vertical-align:middle;margin:0 .14em}.radical .root{font-family:Georgia,serif;font-size:1.65em;line-height:1}.radical .radicand{border-top:3px solid currentColor;padding:.02em .12em 0;margin-top:.12em;white-space:nowrap}
+.mathline{white-space:nowrap}.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.02;font-family:Georgia,'Times New Roman',serif;font-weight:700;margin:0 .08em}.frac>span:first-child{border-bottom:2px solid currentColor;padding:0 .12em .04em}.frac>span:last-child{padding:.04em .12em 0}
+.var{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:1em;line-height:inherit;vertical-align:baseline}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px;margin:22px 0}
+.opt{display:flex;align-items:center;gap:13px;border:1px solid #485b9c;border-radius:15px;padding:16px;background:linear-gradient(130deg,#18264d,#171d3d);cursor:pointer;font-size:clamp(1.08rem,1.6vw,1.3rem);line-height:1.4;min-height:66px;color:#eef4ff;transition:.2s;box-shadow:inset 0 0 15px #6485ff08}
+.opt:hover{border-color:var(--cyan);background:#1d315d;transform:translateY(-2px);box-shadow:0 0 16px #35d9df22}.opt:has(input:checked){border-color:var(--violet);background:#29265b;box-shadow:0 0 18px #a879ff33}
+.opt input{accent-color:#46e9df;width:22px;height:22px;flex:none}
+.hint{background:#302b25;border:1px solid #9a7d40;border-radius:14px;padding:14px 17px;margin:20px 0;color:#ffe5a0;font-size:1.08rem;line-height:1.5}
+.match{display:grid;grid-template-columns:minmax(220px,1fr) minmax(250px,1fr);gap:12px 16px;align-items:center}.match .term{background:#19264d;border:1px solid #4a5b96;border-radius:13px;padding:15px;font-size:1.2rem;font-weight:700;color:#f0f5ff}
+select{width:100%;min-width:0;border:1px solid #5267a7;border-radius:12px;padding:13px;font:inherit;font-size:1.12rem;background:#111a39;color:#f0f5ff}
+.action{border:1px solid #5ef1e7;border-radius:14px;padding:15px 23px;background:linear-gradient(100deg,#087e9a,#5b49bd);color:white;font-weight:900;font-size:1.12rem;cursor:pointer;box-shadow:0 0 18px #34d9df33;transition:.2s}
+.action:hover{filter:brightness(1.15);transform:translateY(-2px);box-shadow:0 0 25px #34d9df55}.action.alt{background:#19264d;color:#cfeaff;border:1px solid #5366a7;box-shadow:none}.action:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.feedback{display:none;margin-top:18px;padding:17px;border-radius:14px;line-height:1.6;font-size:1.1rem}.feedback.show{display:block}.good{background:#103b3b;border:1px solid #35c99b;color:#aaffdc}.bad{background:#421d35;border:1px solid #e46b91;color:#ffd1dd}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:24px}
+.final{display:none;text-align:center;padding:38px}.final.show{display:block}.pill{display:inline-block;background:#252b60;border:1px solid #8e77e7;border-radius:30px;padding:10px 18px;color:#e3d7ff;font-weight:900;font-size:1.08rem}
+.stage{background:linear-gradient(120deg,#16264a,#1b1c42);border:1px solid #4c5e9c;border-radius:16px;padding:18px;margin:15px 0}.stage h3{font-size:1.28rem;color:#8ceef2;margin:0 0 13px}.stage p{font-size:1.1rem;line-height:1.5}
+.solution-line{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0}.solution-line label{font-size:1.1rem;font-weight:700;color:#e6edff}
+.small{font-size:.95rem;color:#8194c5;text-align:center;margin:18px 0 0;grid-column:1/-1}
+.start-screen{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at center,#1a2457ee,#050817f5 72%);backdrop-filter:blur(8px)}
+.start-box{position:relative;width:min(760px,96vw);padding:clamp(25px,5vw,55px);text-align:center;border:1px solid #6673c7;border-radius:30px;background:linear-gradient(145deg,#17234b,#11132f);box-shadow:0 0 70px #6b54d855;overflow:hidden}
+.start-box:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 20%,#5e54b333,transparent 45%);pointer-events:none}
+.rocket{font-size:clamp(3.5rem,8vw,6rem);display:block;filter:drop-shadow(0 0 18px #4cf2ff);animation:rocketFloat 2.7s ease-in-out infinite}
+@keyframes rocketFloat{0%,100%{transform:translateY(4px) rotate(-8deg)}50%{transform:translateY(-15px) rotate(4deg)}}
+.start-box h2{font-size:clamp(2rem,5vw,3.2rem);margin:12px 0;color:#fff}.start-box p{color:#c4d2ff;font-size:1.2rem;line-height:1.6}.start-box .action{margin-top:12px;padding:17px 34px;font-size:1.2rem}
+.planet-scene{height:155px;position:relative;margin:8px auto 12px;max-width:360px;display:grid;place-items:center}
+.planet{width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#9ffcff,#2b83bd 38%,#4b3d9c 72%,#171b50);box-shadow:inset -15px -12px 22px #090c35aa,0 0 36px #35d8e6aa;position:relative;animation:planetGlow 4s ease-in-out infinite alternate}
+.planet:after{content:"";position:absolute;width:145px;height:38px;border:4px solid #b68aff;border-left-color:#50e8ed;border-right-color:#ff85d6;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-22deg);box-shadow:0 0 14px #a879ff99}
+@keyframes planetGlow{from{filter:hue-rotate(-8deg);box-shadow:inset -15px -12px 22px #090c35aa,0 0 24px #35d8e688}to{filter:hue-rotate(12deg);box-shadow:inset -15px -12px 22px #090c35aa,0 0 48px #a879ffaa}}
+/* Стартовий екран: комфортне відображення на типовій висоті ноутбука при масштабі браузера 100% */
+@media(max-height:820px) and (min-width:700px){
+ .start-screen{padding:10px;overflow-y:auto;align-items:center}
+ .start-box{padding:clamp(16px,2.2vh,28px) clamp(22px,3vw,42px);max-height:calc(100svh - 20px);overflow-y:auto}
+ .rocket{font-size:clamp(2.5rem,5.5vh,4.2rem);line-height:1.05}
+ .planet-scene{height:clamp(76px,12vh,112px);margin:3px auto 7px}
+ .planet{width:clamp(66px,9vh,88px);height:clamp(66px,9vh,88px)}
+ .planet:after{width:128%;height:34%}
+ .start-box h2{font-size:clamp(1.7rem,3.8vh,2.45rem);margin:8px 0 5px;line-height:1.12}
+ .start-box p{font-size:clamp(.98rem,1.9vh,1.12rem);line-height:1.42;margin:8px auto;max-width:700px}
+ .start-box .action{margin-top:7px;padding:13px 28px;font-size:1.05rem}
+ .start-box .kicker{font-size:.82rem;padding:7px 13px}
+}
+@media(max-height:680px){
+ .start-box{padding:12px 22px}
+ .rocket{font-size:2.4rem}
+ .planet-scene{height:65px;margin:0 auto 5px}
+ .planet{width:58px;height:58px}
+ .start-box h2{font-size:1.65rem;margin:6px 0}
+ .start-box p{font-size:.94rem;margin:5px auto}
+ .start-box .action{padding:10px 22px;margin-top:5px}
+}
+@media(max-width:850px){.wrap{grid-template-columns:1fr}.sidebar{position:static}.map-title{margin-top:14px}nav{display:grid;grid-template-columns:repeat(4,1fr)}nav button{justify-content:center;text-align:center;font-size:.88rem;padding:10px 5px}.small{grid-column:auto}}
+@media(max-width:560px){header:before,header:after{display:none}.wrap{padding:12px}.sidebar{padding:13px}.hud{display:grid;grid-template-columns:1fr}.score{margin-top:9px}.match{grid-template-columns:1fr}.system .brace{font-size:3.5rem}.opt{font-size:1rem;padding:13px}.problem{overflow-x:auto}.start-box p{font-size:1rem}}
+</style>
+</head>
+<body>
+<header>
+ <div class="tag">КООРДИНАТИ: МАТЕМАТИЧНИЙ КОСМОС</div>
+ <h1>Системи лінійних нерівностей</h1>
+ <p>Системи лінійних нерівностей · 7 космічних випробувань</p>
+</header>
+<main class="wrap">
+ <aside class="sidebar">
+  <div class="side-title">ПАНЕЛЬ МІСІЇ</div>
+  <div class="meter"><div class="meter-top"><span id="progressText">Випробування 1 / 7</span><span id="progressPct">0%</span></div><div class="bar"><span id="progressBar"></span></div></div>
+  <div class="score"><span class="coin">✦</span><span>ЗІБРАНО ЗІРОК<br><b id="score">0</b> / 7</span></div>
+  <div class="map-title">КАРТА ВИПРОБУВАНЬ</div>
+  <nav id="nav" aria-label="Карта семи випробувань"></nav>
+ </aside>
+ <section class="game-area">
+  <section class="card" id="task" aria-live="polite"></section>
+  <section class="card final" id="final"><span class="pill">✦ МІСІЮ ЗАВЕРШЕНО ✦</span><h2>Космічний результат: <span id="finalScore">0</span> / 7</h2><p id="message" class="muted"></p><div class="planet-scene"><div class="planet"></div></div><button class="action" onclick="restart()">↻ Запустити місію знову</button></section>
+ </section>
+ <p class="small">Підказка навігатора: розв’язок системи — це перетин розв’язків усіх нерівностей.</p>
+</main>
+<div class="start-screen" id="startScreen">
+ <div class="start-box">
+  <span class="rocket">🚀</span>
+  <div class="planet-scene"><div class="planet"></div></div>
+  <span class="kicker">МАТЕМАТИЧНА МІСІЯ · 9 КЛАС</span>
+  <h2>Підкорюй космос нерівностей!</h2>
+  <p>На тебе чекають 7 випробувань. Розв’язуй системи, знаходь правильні відповіді та збирай зоряні бали.</p>
+  <button class="action" onclick="startGame()">▶ РОЗПОЧАТИ МІСІЮ</button>
+ </div>
+</div>
+<script>
+const sys=(a,b)=>`<span class="system"><span class="brace">{</span><span class="rows"><span>${a}</span><span>${b}</span></span></span>`;
+const T=[
+{title:'Чи є число розв’язком системи?',type:'one',desc:'Перевір, чи задовольняє число обидві нерівності одночасно.',problem:sys('x + 2 > 5','3x − 9 ≤ 6'),opts:['2','3','4','6'],ans:[2],why:'Для x = 4: 4 + 2 > 5 — істина; 3·4 − 9 ≤ 6, тобто 3 ≤ 6 — істина. Отже, число 4 є розв’язком.'},
+{title:'Розв’яжи систему нерівностей',type:'one',desc:'Розв’яжи кожну нерівність окремо, а потім знайди перетин проміжків.',problem:sys('3x + 2 > 8','2x − 4 ≤ 12'),opts:['(2; 8]','[2; 8)','(−∞; 2]','[8; +∞)'],ans:[0],why:'З першої нерівності x > 2, з другої x ≤ 8. Перетин: (2; 8]. Усі варіанти відповіді — різні проміжки.'},
+{title:'Зістав нерівність із її розв’язком',type:'match',desc:'Розв’яжи кожну нерівність і встанови відповідність. Зверни увагу: спільний розв’язок — це перетин.',problem:sys('7 − x ≤ 2','3x ≤ 24'),pairs:[['7 − x ≤ 2','x ≥ 5'],['3x ≤ 24','x ≤ 8'],['Спільний розв’язок','[5; 8]']],why:'Перша нерівність дає x ≥ 5, друга — x ≤ 8. Їх перетин — [5; 8].'},
+{title:'Знайди всі цілі розв’язки',type:'many',desc:'Спочатку визнач спільний проміжок, потім обери всі цілі числа, які йому належать.',problem:sys('x > −3','x ≤ 5'),opts:['−3','−2','−1','0','1','2','3','4','5','6'],ans:[1,2,3,4,5,6,7,8],why:'Проміжок розв’язків: (−3; 5]. Цілі числа: −2, −1, 0, 1, 2, 3, 4, 5.'},
+{title:'Розв’яжи подвійну нерівність',type:'one',desc:'Розділи подвійну нерівність на дві та розв’яжи кожну з них.',problem:'−2 < 2 − x/4 ≤ 5',opts:['[−12; 16)','(−12; 16]','(−∞; −12]','[16; +∞)'],ans:[0],why:'З −2 < 2 − x/4 отримуємо x < 16. З 2 − x/4 ≤ 5 отримуємо x ≥ −12. Разом: [−12; 16).'},
+{title:'Знайди область визначення виразу',type:'domain',desc:'Під кожним коренем має бути невід’ємний вираз. Обери умови, розв’яжи їх і знайди перетин.',problem:'<span class="mathline"><span class="radical"><span class="root">√</span><span class="radicand">(3x − 6)</span></span> + <span class="radical"><span class="root">√</span><span class="radicand">(12 − 3x)</span></span></span>',opts:['3x − 6 ≥ 0','3x − 6 > 0','12 − 3x ≥ 0','12 − 3x > 0'],ans:[0,2],why:'Правильно: 3x − 6 ≥ 0 та 12 − 3x ≥ 0. Розв’язуємо: 3x ≥ 6, отже x ≥ 2; −3x ≥ −12, отже x ≤ 4 (знак змінюється під час ділення на −3). Перетин: [2; 4].'},
+{title:'Розв’яжи текстову задачу',type:'one',desc:'Склади дві умови: нерівність трикутника та нерівність для периметра.',problem:'Одна сторона трикутника — 5 см, друга — 9 см. Якою може бути третя сторона x, якщо периметр менший за 22 см?',opts:['4 < x < 8','0 < x < 8','4 < x < 14','x > 4'],ans:[0],why:'Нерівність трикутника: x > 9 − 5 = 4. Периметр: 5 + 9 + x < 22, звідси x < 8. Отже, 4 < x < 8.'}
+];
+let cur=0,score=0,done=new Set(),domainStage=1;
+const nav=document.getElementById('nav');
+function navBuild(){nav.innerHTML='';T.forEach((t,i)=>{let b=document.createElement('button');b.innerHTML=(done.has(i)?'✦ ':'')+'<span>Випробування '+(i+1)+'</span>';b.className=(i===cur?'active ':'')+(done.has(i)?'done':'');b.onclick=()=>show(i);nav.appendChild(b)})}
+function show(i){cur=i;domainStage=1;document.getElementById('final').classList.remove('show');document.getElementById('task').style.display='block';document.getElementById('progressText').textContent=`Випробування ${i+1} / 7`;document.getElementById('progressPct').textContent=Math.round(done.size/7*100)+'% досліджено';document.getElementById('progressBar').style.width=(done.size/7*100)+'%';document.getElementById('progressPct').textContent=Math.round(done.size/7*100)+'% досліджено';navBuild();render()}
+function render(){let t=T[cur],s=`<span class="kicker">Завдання ${cur+1} · ${t.type==='many'?'Кілька відповідей':t.type==='match'?'На відповідність':t.type==='domain'?'Кілька етапів':'Одна відповідь'}</span><h2>${t.title}</h2><p class="muted">${t.desc}</p><div class="problem">${t.problem}</div>`;
+if(t.type==='one'||t.type==='many')s+=`<div class="opts">${t.opts.map((o,i)=>`<label class="opt"><input type="${t.type==='many'?'checkbox':'radio'}" name="ans" value="${i}"><span>${o}</span></label>`).join('')}</div>`;
+if(t.type==='match')s+=`<div class="match">${t.pairs.map((p,i)=>`<div class="term">${p[0]}</div><select id="m${i}"><option value="">Обери відповідь…</option>${t.pairs.map((q,j)=>`<option value="${j}">${q[1]}</option>`).join('')}</select>`).join('')}</div>`;
+if(t.type==='domain')s+=domainMarkup();
+s+=`<div class="hint">💡 Працюй послідовно: виконай кожен крок і лише потім записуй спільну відповідь.</div><button class="action" onclick="check()">Перевірити відповідь</button><div id="fb" class="feedback"></div><div class="foot"><button class="action alt" onclick="show(${Math.max(0,cur-1)})" ${cur===0?'disabled':''}>← Назад</button><button class="action" id="next" onclick="next()" disabled>${cur===6?'Підсумок':'Наступне завдання →'}</button></div>`;
+s=s.replace(/(?<![A-Za-z])x(?![A-Za-z])/g, '<i class="var">x</i>');s=s.replace('− <i class="var">x</i>/4','− <span class="frac"><span><i class="var">x</i></span><span>4</span></span>');document.getElementById('task').innerHTML=s}
+function domainMarkup(){return `<div class="stage"><h3>Крок 1. Обери умови існування коренів</h3><div class="opts">${T[5].opts.map((o,i)=>`<label class="opt"><input type="checkbox" name="domain" value="${i}"><span>${o}</span></label>`).join('')}</div></div><div class="stage"><h3>Крок 2. Розв’яжи кожну нерівність</h3><div class="solution-line"><label for="sol1">З 3x − 6 ≥ 0 отримуємо:</label><select id="sol1"><option value="">Обери…</option><option>x ≥ 2</option><option>x ≤ 2</option><option>x > 2</option><option>x < 2</option></select></div><div class="solution-line"><label for="sol2">З 12 − 3x ≥ 0 отримуємо:</label><select id="sol2"><option value="">Обери…</option><option>x ≥ 4</option><option>x ≤ 4</option><option>x > 4</option><option>x < 4</option></select></div></div><div class="stage"><h3>Крок 3. Обери область визначення</h3><div class="opts">${['(2; 4)','[2; 4]','[2; 4)','(2; 4]'].map((o,i)=>`<label class="opt"><input type="radio" name="domainFinal" value="${i}"><span>${o}</span></label>`).join('')}</div></div>`}
+function markDone(ok,explain){let f=document.getElementById('fb');f.className='feedback show '+(ok?'good':'bad');f.innerHTML=(ok?'✅ Правильно! Чудова робота.':'❌ Перевір окремі кроки та спробуй ще раз.')+'<br>'+explain;if(ok){if(!done.has(cur)){done.add(cur);score++;document.getElementById('score').textContent=score}document.getElementById('next').disabled=false;document.getElementById('progressBar').style.width=(done.size/7*100)+'%';document.getElementById('progressPct').textContent=Math.round(done.size/7*100)+'% досліджено';navBuild()}}
+function check(){let t=T[cur],ok=false;if(t.type==='domain'){let a=[...document.querySelectorAll('input[name=domain]:checked')].map(x=>+x.value).sort(),b=[0,2];let c=document.getElementById('sol1').selectedIndex===1,d=document.getElementById('sol2').selectedIndex===2,e=document.querySelector('input[name=domainFinal]:checked');ok=a.length===2&&a[0]===b[0]&&a[1]===b[1]&&c&&d&&e&&+e.value===1;markDone(ok,t.why);return}
+if(t.type==='match')ok=t.pairs.every((p,i)=>document.getElementById('m'+i).value!==''&&+document.getElementById('m'+i).value===i);else{let a=[...document.querySelectorAll('input[name=ans]:checked')].map(x=>+x.value).sort((a,b)=>a-b),b=[...t.ans].sort((a,b)=>a-b);ok=a.length===b.length&&a.every((v,i)=>v===b[i])}markDone(ok,t.why)}
+function next(){if(cur<6)show(cur+1);else{document.getElementById('task').style.display='none';document.getElementById('final').classList.add('show');document.getElementById('finalScore').textContent=score;document.getElementById('message').textContent=score===7?'Чудова робота! Ти впевнено володієш темою.':score>=5?'Гарний результат! Переглянь пояснення до завдань, де були помилки.':'Не засмучуйся! Повтори алгоритми та спробуй ще раз.';document.getElementById('progressBar').style.width='100%';document.getElementById('progressPct').textContent='100% пройдено'}}
+function startGame(){document.getElementById('startScreen').style.display='none';}
+function restart(){score=0;done.clear();document.getElementById('score').textContent='0';document.getElementById('final').classList.remove('show');document.getElementById('task').style.display='block';show(0);document.getElementById('startScreen').style.display='none'}
+show(0);
+</script>
+</body></html>
